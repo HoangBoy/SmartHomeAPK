@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">SmartHome</string>
+    <string name="app_logo">Logo ứng dụng</string>
+    <string name="welcome_message">Chào mừng đến với Ứng dụng Nhà Thông Minh</string>
+    <string name="username_hint">Tên đăng nhập</string>
+    <string name="password_hint">Mật khẩu</string>
+    <string name="login">Đăng nhập</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="register">Đăng ký tài khoản mới</string>
+    <string name="primaryTextColor">#FFFFFF</string>
+    <string name="secondaryTextColor">#888888</string>
+    <string name="primaryButtonColor">#2196F3</string>
+    <string name="backgroundColor">#F5F5F5</string>
+</resources>

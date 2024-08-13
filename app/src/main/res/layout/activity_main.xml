@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:padding="16dp">
+
+    <!-- Tiêu đề ứng dụng -->
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp"
+
+        android:text="Nhà Thông Minh"
+        android:textColor="#4CAF50"
+        android:textSize="34sp" />
+
+    <!-- Các nút điều khiển thiết bị -->
+
+    <!-- Hiển thị trạng thái thiết bị -->
+    <GridLayout
+        android:id="@+id/deviceControlGrid"
+        android:layout_width="367dp"
+        android:layout_height="592dp"
+        android:layout_above="@+id/statusTextView"
+        android:layout_below="@id/titleTextView"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="18dp"
+        android:columnCount="2"
+        android:padding="8dp"
+        android:rowCount="2">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <Switch
+                    android:id="@+id/switch1"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:background="#009688"
+                    android:backgroundTint="#60434130"
+                    android:minHeight="48dp"
+                    android:text="Đèn phòng khách"
+                    android:textColor="@color/black"
+                    android:textSize="24sp" />
+
+                <Switch
+                    android:id="@+id/switch2"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:background="#FFC107"
+                    android:backgroundTint="#57FF9800"
+                    android:minHeight="48dp"
+                    android:text="Quạt phòng ngủ"
+                    android:textColor="@color/black"
+                    android:textSize="24sp" />
+
+                <Switch
+                    android:id="@+id/switch3"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:background="#81F44336"
+                    android:minHeight="48dp"
+                    android:text="Bình nóng lạnh"
+                    android:textColor="@color/black"
+                    android:textSize="24sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <Button
+                        android:id="@+id/button5"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:backgroundTint="#009688"
+                        android:minHeight="48dp"
+                        android:text="Mở cửa"
+                        android:textSize="24sp" />
+
+                    <Button
+                        android:id="@+id/button6"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:backgroundTint="#3F51B5"
+                        android:text="Đóng cửa"
+                        android:textSize="24sp" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </GridLayout>
+
+    <TextView
+        android:id="@+id/statusTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="18dp"
+        android:background="#171E7985"
+        android:padding="10dp"
+        android:text="Status: Ready"
+        android:textColor="@color/black"
+        android:textSize="24sp" />
+
+</RelativeLayout>
