@@ -1,13 +1,20 @@
 package com.example.smarthomeapk;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.smarthomeapk.api.ApiService;
 import com.example.smarthomeapk.model.DeviceControlRequest;
@@ -21,11 +28,15 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     private Switch switch1, switch2, switch3;
-    private Button openDoorButton, closeDoorButton;
+    private Button openDoorButton, closeDoorButton, voiceControlButton;
     private TextView statusTextView;
     private ApiService apiService;
     private final String API_KEY = "Bearer aB1cD2eF3gH4iJ5kL6mN7oP8qR9sT0uVwXyZ!";
+    private SpeechRecognizer speechRecognizer;
+    private boolean permissionToRecordAccepted = false;
+    private String[] permissions = {Manifest.permission.RECORD_AUDIO};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         switch3 = findViewById(R.id.switch3);
         openDoorButton = findViewById(R.id.button5);
         closeDoorButton = findViewById(R.id.button6);
+        voiceControlButton = findViewById(R.id.btnSpeak);
         statusTextView = findViewById(R.id.statusTextView);
 
         // Khởi tạo API Service
@@ -52,8 +64,110 @@ public class MainActivity extends AppCompatActivity {
         openDoorButton.setOnClickListener(v -> controlDevice(4, "open"));
         closeDoorButton.setOnClickListener(v -> controlDevice(4, "close"));
 
+        // Đặt sự kiện cho nút mic
+        voiceControlButton.setOnClickListener(v -> {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
+            } else {
+                initializeSpeechRecognizer();
+                speechRecognizer.startListening(createSpeechRecognizerIntent());
+            }
+        });
+
         // Cập nhật trạng thái khi mở ứng dụng
         updateStatus();
+    }
+
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
+            permissionToRecordAccepted = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+            if (permissionToRecordAccepted) {
+                initializeSpeechRecognizer();
+                speechRecognizer.startListening(createSpeechRecognizerIntent());
+            } else {
+                Toast.makeText(this, "Ứng dụng cần quyền truy cập microphone để nhận diện giọng nói", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void initializeSpeechRecognizer() {
+        if (speechRecognizer != null) {
+            speechRecognizer.destroy();
+        }
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+        speechRecognizer.setRecognitionListener(new RecognitionListener() {
+            @Override
+            public void onReadyForSpeech(Bundle params) {}
+            @Override
+            public void onBeginningOfSpeech() {}
+            @Override
+            public void onRmsChanged(float rmsdB) {}
+            @Override
+            public void onBufferReceived(byte[] buffer) {}
+            @Override
+            public void onEndOfSpeech() {}
+            @Override
+            public void onError(int error) {
+                String message;
+                switch (error) {
+                    case SpeechRecognizer.ERROR_AUDIO:
+                        message = "Lỗi âm thanh";
+                        break;
+                    case SpeechRecognizer.ERROR_CLIENT:
+                        message = "Lỗi client";
+                        break;
+                    case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
+                        message = "Thiếu quyền";
+                        break;
+                    case SpeechRecognizer.ERROR_NETWORK:
+                        message = "Lỗi mạng";
+                        break;
+                    case SpeechRecognizer.ERROR_NETWORK_TIMEOUT:
+                        message = "Hết thời gian chờ mạng";
+                        break;
+                    case SpeechRecognizer.ERROR_NO_MATCH:
+                        message = "Không nhận diện được giọng nói";
+                        break;
+                    case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
+                        message = "Recognizer đang bận";
+                        break;
+                    case SpeechRecognizer.ERROR_SERVER:
+                        message = "Lỗi server";
+                        break;
+                    case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
+                        message = "Hết thời gian chờ giọng nói";
+                        break;
+                    default:
+                        message = "Lỗi không xác định";
+                        break;
+                }
+                Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+            @Override
+            public void onResults(Bundle results) {
+                List<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+                if (matches != null && !matches.isEmpty()) {
+                    String command = matches.get(0).toLowerCase();
+                    processVoiceCommand(command);
+                }
+            }
+            @Override
+            public void onPartialResults(Bundle partialResults) {}
+            @Override
+            public void onEvent(int eventType, Bundle params) {}
+        });
+    }
+
+    private Intent createSpeechRecognizerIntent() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "vi-VN");
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Hãy nói lệnh của bạn");
+        return intent;
     }
 
     private void controlDevice(int id, String status) {
@@ -63,7 +177,6 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(MainActivity.this, "Đồng bộ API thành công", Toast.LENGTH_SHORT).show();
-
                     updateStatus();  // Cập nhật trạng thái thiết bị
                 } else {
                     Toast.makeText(MainActivity.this, "Thao tác thất bại", Toast.LENGTH_SHORT).show();
@@ -83,8 +196,6 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<List<DeviceStatusResponse>> call, Response<List<DeviceStatusResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<DeviceStatusResponse> statuses = response.body();
-
-                    // Duyệt qua danh sách trạng thái thiết bị và cập nhật giao diện người dùng
                     StringBuilder statusBuilder = new StringBuilder();
                     for (DeviceStatusResponse status : statuses) {
                         switch (status.getId()) {
@@ -101,7 +212,6 @@ public class MainActivity extends AppCompatActivity {
                                 statusTextView.setText("" + status.getMessage());
                                 break;
                             default:
-                                // Xử lý các thiết bị khác nếu có
                                 break;
                         }
                         statusBuilder.append(status.getName()).append(": ").append(status.getStatus()).append("\n");
@@ -117,5 +227,47 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void processVoiceCommand(String command) {
+        if (command.contains("bật đèn phòng khách")) {
+            controlDevice(1, "on");
+        } else if (command.contains("tắt đèn phòng khách")) {
+            controlDevice(1, "off");
+        } else if (command.contains("bật quạt phòng ngủ")) {
+            controlDevice(2, "on");
+        } else if (command.contains("tắt quạt phòng ngủ")) {
+            controlDevice(2, "off");
+        } else if (command.contains("bật bình nóng lạnh")) {
+            controlDevice(3, "on");
+        } else if (command.contains("tắt bình nóng lạnh")) {
+            controlDevice(3, "off");
+        } else if (command.contains("mở cửa")) {
+            controlDevice(4, "open");
+        } else if (command.contains("đóng cửa")) {
+            controlDevice(4, "close");
+        }
+        else if (command.contains("tắt tất cả thiết bị")) {
+            for (int i = 1; i < 4; i++) {
+                controlDevice(i, "off");
+            }
+        }
+        else if (command.contains("bật tất cả thiết bị")) {
+                for (int i = 1; i < 4; i++){
+                    controlDevice(i, "on");
+                }
+        }
+        else {
+            Toast.makeText(this, "Lệnh không hợp lệ", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (speechRecognizer != null) {
+            speechRecognizer.destroy();
+            speechRecognizer = null;
+        }
     }
 }

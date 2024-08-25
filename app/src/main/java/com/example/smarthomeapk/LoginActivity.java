@@ -36,7 +36,7 @@ public class LoginActivity extends AppCompatActivity {
         // Sự kiện cho TextView quên mật khẩu và đăng ký
         forgotPasswordTextView.setOnClickListener(v -> {
             // Xử lý sự kiện quên mật khẩu (chuyển đến màn hình quên mật khẩu)
-            Toast.makeText(this, "Quên mật sẽ sớm đuược phát triển", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Quên mật khẩu sẽ sớm được phát triển", Toast.LENGTH_SHORT).show();
         });
 
         registerTextView.setOnClickListener(v -> {
@@ -54,7 +54,7 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        // Giả sử xác thực thành công nếu username là "admin" và password là "password"
+        // Giả sử xác thực thành công nếu username là "hoangdz" và password là "h123@"
         if (username.equals("hoangdz") && password.equals("h123@")) {
             // Lưu trạng thái đăng nhập vào SharedPreferences
             SharedPreferences sharedPreferences = getSharedPreferences("SmartHomePrefs", MODE_PRIVATE);
