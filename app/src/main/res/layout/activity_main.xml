@@ -6,6 +6,7 @@
     android:background="@color/background"
     android:padding="16dp">
 
+
     <!-- Tiêu đề ứng dụng -->
     <TextView
         android:id="@+id/titleTextView"
@@ -18,17 +19,19 @@
         android:textColor="#4CAF50"
         android:textSize="34sp" />
 
+
     <!-- Các nút điều khiển thiết bị -->
 
     <!-- Hiển thị trạng thái thiết bị -->
+
     <GridLayout
         android:id="@+id/deviceControlGrid"
         android:layout_width="367dp"
         android:layout_height="592dp"
         android:layout_above="@+id/statusTextView"
         android:layout_below="@id/titleTextView"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="18dp"
+        android:layout_marginTop="13dp"
+        android:layout_marginBottom="33dp"
         android:columnCount="2"
         android:padding="8dp"
         android:rowCount="2">
@@ -43,13 +46,53 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+<!--                    <EditText-->
+<!--                        android:id="@+id/ipAddressEditText"-->
+<!--                        android:layout_width="205dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_row="0"-->
+<!--                        android:layout_column="0"-->
+<!--                        android:hint="Nhập địa chỉ IP"-->
+<!--                        android:inputType="text" />-->
+
+<!--                    <Button-->
+<!--                        android:id="@+id/saveIpAddressButton"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:background="#FF5722"-->
+<!--                        android:text="Lưu địa chỉ IP" />-->
+
+                    <TextView
+                        android:id="@+id/tvTemperature"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Nhiệt độ:"
+                        android:textColor="@color/black"
+                        android:textSize="20dp"/>
+
+                    <TextView
+                        android:id="@+id/tvHumidity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Độ ẩm:"
+                        android:textColor="@color/black"
+                        android:textSize="20dp"/>
+                </LinearLayout>
+
                 <Switch
                     android:id="@+id/switch1"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
+                    android:layout_height="80dp"
                     android:background="#009688"
                     android:backgroundTint="#60434130"
-                    android:minHeight="48dp"
+                    android:minHeight="38dp"
                     android:text="Đèn phòng khách"
                     android:textColor="@color/black"
                     android:textSize="24sp" />
@@ -57,7 +100,7 @@
                 <Switch
                     android:id="@+id/switch2"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
+                    android:layout_height="80dp"
                     android:background="#FFC107"
                     android:backgroundTint="#57FF9800"
                     android:minHeight="48dp"
@@ -68,7 +111,7 @@
                 <Switch
                     android:id="@+id/switch3"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
+                    android:layout_height="80dp"
                     android:background="#81F44336"
                     android:minHeight="48dp"
                     android:text="Bình nóng lạnh"
@@ -114,6 +157,7 @@
             </LinearLayout>
 
         </LinearLayout>
+
 
     </GridLayout>
 
