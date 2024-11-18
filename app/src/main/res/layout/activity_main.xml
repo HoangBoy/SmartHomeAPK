@@ -18,9 +18,7 @@
         android:textColor="#4CAF50"
         android:textSize="34sp" />
 
-    <!-- Các nút điều khiển thiết bị -->
 
-    <!-- Hiển thị trạng thái thiết bị -->
     <GridLayout
         android:id="@+id/deviceControlGrid"
         android:layout_width="367dp"

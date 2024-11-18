@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Khởi tạo các thành phần giao diện người dùng
+
         switch1 = findViewById(R.id.switch1);
         switch2 = findViewById(R.id.switch2);
         switch3 = findViewById(R.id.switch3);
@@ -52,19 +52,19 @@ public class MainActivity extends AppCompatActivity {
         voiceControlButton = findViewById(R.id.btnSpeak);
         statusTextView = findViewById(R.id.statusTextView);
 
-        // Khởi tạo API Service
+
         apiService = RetrofitClient.getClient("https://smarthomeapihoang.azurewebsites.net/").create(ApiService.class);
 
-        // Đặt sự kiện cho các Switch
+
         switch1.setOnCheckedChangeListener((buttonView, isChecked) -> controlDevice(1, isChecked ? "on" : "off"));
         switch2.setOnCheckedChangeListener((buttonView, isChecked) -> controlDevice(2, isChecked ? "on" : "off"));
         switch3.setOnCheckedChangeListener((buttonView, isChecked) -> controlDevice(3, isChecked ? "on" : "off"));
 
-        // Đặt sự kiện cho các Button
+
         openDoorButton.setOnClickListener(v -> controlDevice(4, "open"));
         closeDoorButton.setOnClickListener(v -> controlDevice(4, "close"));
 
-        // Đặt sự kiện cho nút mic
+
         voiceControlButton.setOnClickListener(v -> {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Cập nhật trạng thái khi mở ứng dụng
+
         updateStatus();
     }
 

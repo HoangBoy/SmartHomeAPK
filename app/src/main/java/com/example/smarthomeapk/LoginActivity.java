@@ -21,26 +21,26 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);  // Đảm bảo tên layout đúng với file XML
+        setContentView(R.layout.activity_login);
 
-        // Khởi tạo các phần tử giao diện
+
         usernameEditText = findViewById(R.id.usernameEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
         loginButton = findViewById(R.id.loginButton);
         forgotPasswordTextView = findViewById(R.id.forgotPasswordTextView);
         registerTextView = findViewById(R.id.registerTextView);
 
-        // Thiết lập sự kiện cho nút đăng nhập
+
         loginButton.setOnClickListener(v -> login());
 
-        // Sự kiện cho TextView quên mật khẩu và đăng ký
+
         forgotPasswordTextView.setOnClickListener(v -> {
-            // Xử lý sự kiện quên mật khẩu (chuyển đến màn hình quên mật khẩu)
+
             Toast.makeText(this, "Quên mật khẩu sẽ sớm được phát triển", Toast.LENGTH_SHORT).show();
         });
 
         registerTextView.setOnClickListener(v -> {
-            // Xử lý sự kiện đăng ký (chuyển đến màn hình đăng ký)
+
             Toast.makeText(this, "Đăng ký sẽ sớm được phát triển", Toast.LENGTH_SHORT).show();
         });
     }
@@ -54,15 +54,15 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        // Giả sử xác thực thành công nếu username là "hoangdz" và password là "h123@"
+
         if (username.equals("hoangdz") && password.equals("h123@")) {
-            // Lưu trạng thái đăng nhập vào SharedPreferences
+
             SharedPreferences sharedPreferences = getSharedPreferences("SmartHomePrefs", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("isLoggedIn", true);
             editor.apply();
 
-            // Điều hướng tới MainActivity sau khi đăng nhập thành công
+
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             finish();
