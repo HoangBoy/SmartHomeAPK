@@ -12,7 +12,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText usernameEditText;
     private EditText passwordEditText;
-    private EditText apiUrlEditText;  // Thêm ô nhập URL API nếu cần
+    private EditText apiUrlEditText;
     private Button loginButton;
 
     @Override
@@ -20,17 +20,15 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Khởi tạo các phần tử giao diện
         initializeUIComponents();
 
-        // Thiết lập sự kiện cho nút đăng nhập
         loginButton.setOnClickListener(v -> handleLogin());
     }
 
     private void initializeUIComponents() {
         usernameEditText = findViewById(R.id.usernameEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
-      //ho  apiUrlEditText = findViewById(R.id.apiUrlEditText);  // Khôi phục ô nhập API URL nếu cần
+      //ho  apiUrlEditText = findViewById(R.id.apiUrlEditText);
         loginButton = findViewById(R.id.loginButton);
     }
 

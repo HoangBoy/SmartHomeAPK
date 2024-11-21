@@ -67,41 +67,33 @@ public class MainActivity extends AppCompatActivity {
 //
 
 
-        // Khởi tạo TextView
         temperatureTextView = findViewById(R.id.tvTemperature);
         humidityTextView = findViewById(R.id.tvHumidity);
 
-        // Kết nối đến MQTT broker và subscribe vào topic
         mqttClient = Mqtt5Client.builder()
-                .identifier(UUID.randomUUID().toString()) // Sử dụng UUID ngẫu nhiên làm identifier
-                .serverHost("b5b0a733da9d4bc5a9435dc3adf32503.s1.eu.hivemq.cloud") // Thay thế bằng server host của bạn
+                .identifier(UUID.randomUUID().toString())
+                .serverHost("b5b0a733da9d4bc5a9435dc3adf32503.s1.eu.hivemq.cloud")
                 .serverPort(8883)
                 .sslWithDefaultConfig()
                 .simpleAuth()
-                .username("viethoang") // Thay thế bằng username của bạn
-                .password("24102003@hH".getBytes()) // Thay thế bằng password của bạn
+                .username("viethoang")
+                .password("24102003@hH".getBytes())
                 .applySimpleAuth()
                 .build();
 
-        mqttClient.toBlocking().connect(); // Kết nối đến MQTT Broker
+        mqttClient.toBlocking().connect();
 
-        subscribeToSensorData(); // Subscribe vào topic dữ liệu cảm biến
-//      Intent intent = getIntent();
-//      String url = intent.getStringExtra("apiUrl");
+        subscribeToSensorData();
 
-        // Khởi tạo ApiService với URL từ Intent
-      //  String apiUrl = "http://smarthomenetapi.somee.com/";
         apiService = RetrofitClient.getClient("http://smarthomenetapi.somee.com/").create(ApiService.class);
-        // Đặt sự kiện cho các Switch
+
         switch1.setOnCheckedChangeListener((buttonView, isChecked) -> controlDevice(1, isChecked ? "on" : "off"));
         switch2.setOnCheckedChangeListener((buttonView, isChecked) -> controlDevice(2, isChecked ? "on" : "off"));
         switch3.setOnCheckedChangeListener((buttonView, isChecked) -> controlDevice(3, isChecked ? "on" : "off"));
 
-        // Đặt sự kiện cho các Button
         openDoorButton.setOnClickListener(v -> controlDevice(4, "open"));
         closeDoorButton.setOnClickListener(v -> controlDevice(4, "close"));
 
-        // Đặt sự kiện cho nút mic
         voiceControlButton.setOnClickListener(v -> {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
@@ -111,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Cập nhật trạng thái khi mở ứng dụng
         updateStatus();
     }
 
@@ -131,16 +122,13 @@ private void subscribeToSensorData() {
 }
 
     private void handleSensorData(Mqtt5Publish publish) {
-        // Dữ liệu nhận được từ topic
         String payload = new String(publish.getPayloadAsBytes(), StandardCharsets.UTF_8);
 
-        // Giả sử payload là một chuỗi JSON với định dạng: {"temperature": 25, "humidity": 60}
         try {
             JSONObject jsonObject = new JSONObject(payload);
             final int temperature = jsonObject.getInt("temperature");
             final int humidity = jsonObject.getInt("humidity");
 
-            // Cập nhật UI (phải thực hiện trên luồng chính)
             runOnUiThread(() -> {
                 temperatureTextView.setText("Nhiệt độ: " + temperature + " °C");
                 humidityTextView.setText("Độ ẩm: " + humidity + " %");
@@ -340,9 +328,9 @@ private void subscribeToSensorData() {
         super.onDestroy();
         if (mqttClient != null) {
             try {
-                mqttClient.toBlocking().disconnect(); // Ngắt kết nối MQTT client
+                mqttClient.toBlocking().disconnect();
             } catch (Exception e) {
-                e.printStackTrace(); // Xử lý ngoại lệ nếu có lỗi khi ngắt kết nối
+                e.printStackTrace();
             }
         }
         if (speechRecognizer != null) {
