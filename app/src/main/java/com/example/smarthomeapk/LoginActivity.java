@@ -1,12 +1,10 @@
 package com.example.smarthomeapk;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,60 +12,57 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText usernameEditText;
     private EditText passwordEditText;
+    private EditText apiUrlEditText;
     private Button loginButton;
-    private TextView forgotPasswordTextView;
-    private TextView registerTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        initializeUIComponents();
 
-        usernameEditText = findViewById(R.id.usernameEditText);
-        passwordEditText = findViewById(R.id.passwordEditText);
-        loginButton = findViewById(R.id.loginButton);
-        forgotPasswordTextView = findViewById(R.id.forgotPasswordTextView);
-        registerTextView = findViewById(R.id.registerTextView);
-
-
-        loginButton.setOnClickListener(v -> login());
-
-
-        forgotPasswordTextView.setOnClickListener(v -> {
-
-            Toast.makeText(this, "Quên mật khẩu sẽ sớm được phát triển", Toast.LENGTH_SHORT).show();
-        });
-
-        registerTextView.setOnClickListener(v -> {
-
-            Toast.makeText(this, "Đăng ký sẽ sớm được phát triển", Toast.LENGTH_SHORT).show();
-        });
+        loginButton.setOnClickListener(v -> handleLogin());
     }
 
-    private void login() {
+    private void initializeUIComponents() {
+        usernameEditText = findViewById(R.id.usernameEditText);
+        passwordEditText = findViewById(R.id.passwordEditText);
+      //ho  apiUrlEditText = findViewById(R.id.apiUrlEditText);
+        loginButton = findViewById(R.id.loginButton);
+    }
+
+    private void handleLogin() {
         String username = usernameEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
 
-        if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password)) {
-            Toast.makeText(this, "Vui lòng nhập tên đăng nhập và mật khẩu", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-
-        if (username.equals("hoangdz") && password.equals("h123@")) {
-
-            SharedPreferences sharedPreferences = getSharedPreferences("SmartHomePrefs", MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("isLoggedIn", true);
-            editor.apply();
-
-
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-            finish();
+        if (isInputValid(username, password)) {
+            if (authenticate(username, password)) {
+                navigateToMainActivity();
+            } else {
+                showToast("Tên đăng nhập hoặc mật khẩu không chính xác");
+            }
         } else {
-            Toast.makeText(this, "Tên đăng nhập hoặc mật khẩu không chính xác", Toast.LENGTH_SHORT).show();
+            showToast("Vui lòng nhập tên đăng nhập và mật khẩu");
         }
+    }
+
+    private boolean isInputValid(String username, String password) {
+        return !TextUtils.isEmpty(username) && !TextUtils.isEmpty(password);
+    }
+
+    private boolean authenticate(String username, String password) {
+        // Giả sử xác thực thành công
+        return username.equals("hoangdz") && password.equals("h123@");
+    }
+
+    private void navigateToMainActivity() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

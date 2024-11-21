@@ -8,6 +8,7 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,8 +20,15 @@ import androidx.core.content.ContextCompat;
 import com.example.smarthomeapk.api.ApiService;
 import com.example.smarthomeapk.model.DeviceControlRequest;
 import com.example.smarthomeapk.model.DeviceStatusResponse;
+import com.hivemq.client.mqtt.mqtt5.Mqtt5Client;
+import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5Publish;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.UUID;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -36,13 +44,17 @@ public class MainActivity extends AppCompatActivity {
     private final String API_KEY = "Bearer aB1cD2eF3gH4iJ5kL6mN7oP8qR9sT0uVwXyZ!";
     private SpeechRecognizer speechRecognizer;
     private boolean permissionToRecordAccepted = false;
-    private String[] permissions = {Manifest.permission.RECORD_AUDIO};
+    private final String[] permissions = {Manifest.permission.RECORD_AUDIO};
+    private EditText ipAddressEditText;
+    private Button saveIpAddressButton;
+    private TextView temperatureTextView, humidityTextView;
+    private Mqtt5Client mqttClient;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         switch1 = findViewById(R.id.switch1);
         switch2 = findViewById(R.id.switch2);
@@ -52,18 +64,32 @@ public class MainActivity extends AppCompatActivity {
         voiceControlButton = findViewById(R.id.btnSpeak);
         statusTextView = findViewById(R.id.statusTextView);
 
+        temperatureTextView = findViewById(R.id.tvTemperature);
+        humidityTextView = findViewById(R.id.tvHumidity);
 
-        apiService = RetrofitClient.getClient("https://smarthomeapihoang.azurewebsites.net/").create(ApiService.class);
+        mqttClient = Mqtt5Client.builder()
+                .identifier(UUID.randomUUID().toString())
+                .serverHost("b5b0a733da9d4bc5a9435dc3adf32503.s1.eu.hivemq.cloud")
+                .serverPort(8883)
+                .sslWithDefaultConfig()
+                .simpleAuth()
+                .username("viethoang")
+                .password("24102003@hH".getBytes())
+                .applySimpleAuth()
+                .build();
 
+        mqttClient.toBlocking().connect();
+
+        subscribeToSensorData();
+
+        apiService = RetrofitClient.getClient("http://smarthomenetapi.somee.com/").create(ApiService.class);
 
         switch1.setOnCheckedChangeListener((buttonView, isChecked) -> controlDevice(1, isChecked ? "on" : "off"));
         switch2.setOnCheckedChangeListener((buttonView, isChecked) -> controlDevice(2, isChecked ? "on" : "off"));
         switch3.setOnCheckedChangeListener((buttonView, isChecked) -> controlDevice(3, isChecked ? "on" : "off"));
 
-
         openDoorButton.setOnClickListener(v -> controlDevice(4, "open"));
         closeDoorButton.setOnClickListener(v -> controlDevice(4, "close"));
-
 
         voiceControlButton.setOnClickListener(v -> {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
@@ -74,9 +100,40 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         updateStatus();
     }
+
+private void subscribeToSensorData() {
+    mqttClient.toAsync().subscribeWith()
+            .topicFilter("home/sensors/temperature_humidity")
+            .callback(this::handleSensorData)
+            .send()
+            .whenComplete((subAck, throwable) -> {
+                if (throwable != null) {
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "Không thể subscribe vào topic", Toast.LENGTH_SHORT).show());
+                } else {
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "Đã subscribe vào topic cảm biến", Toast.LENGTH_SHORT).show());
+                }
+            });
+}
+
+    private void handleSensorData(Mqtt5Publish publish) {
+        String payload = new String(publish.getPayloadAsBytes(), StandardCharsets.UTF_8);
+
+        try {
+            JSONObject jsonObject = new JSONObject(payload);
+            final int temperature = jsonObject.getInt("temperature");
+            final int humidity = jsonObject.getInt("humidity");
+
+            runOnUiThread(() -> {
+                temperatureTextView.setText("Nhiệt độ: " + temperature + " °C");
+                humidityTextView.setText("Độ ẩm: " + humidity + " %");
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+///
 
 
 
@@ -176,7 +233,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(MainActivity.this, "Đồng bộ API thành công", Toast.LENGTH_SHORT).show();
                     updateStatus();  // Cập nhật trạng thái thiết bị
                 } else {
                     Toast.makeText(MainActivity.this, "Thao tác thất bại", Toast.LENGTH_SHORT).show();
@@ -209,19 +265,20 @@ public class MainActivity extends AppCompatActivity {
                                 switch3.setChecked(status.getStatus().equals("on"));
                                 break;
                             case 4:
-                                statusTextView.setText("" + status.getMessage());
+                                statusTextView.setText(status.getMessage());
                                 break;
                             default:
                                 break;
                         }
                         statusBuilder.append(status.getName()).append(": ").append(status.getStatus()).append("\n");
                     }
+                    Toast.makeText(MainActivity.this, "Update trạng thái thiết bị thành công", Toast.LENGTH_SHORT).show();
+
                     statusTextView.setText(statusBuilder.toString().trim());
                 } else {
                     Toast.makeText(MainActivity.this, "Không thể lấy trạng thái thiết bị", Toast.LENGTH_SHORT).show();
                 }
             }
-
             @Override
             public void onFailure(Call<List<DeviceStatusResponse>> call, Throwable t) {
                 Toast.makeText(MainActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
@@ -265,6 +322,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (mqttClient != null) {
+            try {
+                mqttClient.toBlocking().disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         if (speechRecognizer != null) {
             speechRecognizer.destroy();
             speechRecognizer = null;
