@@ -1,5 +1,6 @@
-<img width="1680" alt="Ảnh màn hình 2024-11-21 lúc 19 06 28" src="https://github.com/user-attachments/assets/1fe3371d-8806-4dfd-aa88-98e94797ebe8">
-<img width="1680" alt="Ảnh màn hình 2024-11-21 lúc 19 06 15" src="https://github.com/user-attachments/assets/10a0d0ec-232e-48cd-a5a3-b35894d815e3">
+
+<img width="1680" alt="Ảnh màn hình 2024-11-21 lúc 19 11 06" src="https://github.com/user-attachments/assets/5e96a448-b5c0-483f-9970-cdbc8c85dec1">
+<img width="1680" alt="Ảnh màn hình 2024-11-21 lúc 19 11 59" src="https://github.com/user-attachments/assets/054d6275-8ec6-47be-9c7c-34c626895194">
 Hệ thống Nhà Thông Minh Điều Khiển Qua Ứng Dụng Di Động
 Giới thiệu
 Dự án Hệ thống Nhà Thông Minh là một giải pháp IoT (Internet of Things) giúp quản lý và điều khiển các thiết bị trong gia đình thông qua ứng dụng di động. Với mục tiêu mang lại sự tiện nghi và an toàn, hệ thống cho phép người dùng điều khiển ánh sáng, quạt, bình nóng lạnh, cửa cuốn và các thiết bị cảnh báo từ xa qua giao diện thân thiện.
